@@ -1,0 +1,159 @@
+openapi: 3.0.1
+info:
+  title: Account Service API
+  description: API para realizar operaciones bancarias (depósitos, retiros, consultas de balance y transacciones).
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local
+
+paths:
+  /accounts/{accountId}/deposit:
+    post:
+      summary: Realiza un depósito en la cuenta especificada
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la cuenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+      responses:
+        '200':
+          description: Depósito realizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Cuenta no encontrada
+        '400':
+          description: Solicitud inválida
+
+  /accounts/{accountId}/withdraw:
+    post:
+      summary: Realiza un retiro en la cuenta especificada
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la cuenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+      responses:
+        '200':
+          description: Retiro realizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Cuenta no encontrada
+        '400':
+          description: Solicitud inválida
+        '409':
+          description: Fondos insuficientes
+
+  /accounts/{accountId}/balance:
+    get:
+      summary: Obtiene el balance actual de la cuenta especificada
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la cuenta
+      responses:
+        '200':
+          description: Balance de la cuenta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    description: Balance actual de la cuenta
+        '404':
+          description: Cuenta no encontrada
+
+  /accounts/{accountId}/transactions:
+    get:
+      summary: Obtiene todas las transacciones de la cuenta especificada
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la cuenta
+      responses:
+        '200':
+          description: Lista de transacciones de la cuenta
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Cuenta no encontrada
+
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de la cuenta
+        balance:
+          type: number
+          description: Balance actual de la cuenta
+        accountType:
+          type: string
+          description: Tipo de cuenta
+        customerId:
+          type: string
+          description: ID del cliente asociado a la cuenta
+
+    TransactionDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Monto de la transacción
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de la transacción
+        productId:
+          type: string
+          description: ID de la cuenta a la que pertenece la transacción
+        amount:
+          type: number
+          description: Monto de la transacción
+        type:
+          type: string
+          description: Tipo de transacción (ej. depósito, retiro)
+        transactionDate:
+          type: string
+          format: date-time
+          description: Fecha de la transacción

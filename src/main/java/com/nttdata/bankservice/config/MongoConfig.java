@@ -33,6 +33,4 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     public ReactiveMongoTemplate reactiveMongoTemplate() {
         return new ReactiveMongoTemplate(reactiveMongoClient(), getDatabaseName());
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.nttdata.bankservice.controller;
 
 
+import com.nttdata.bankservice.client.CustomerNotification;
 import com.nttdata.bankservice.dto.CustomerDto;
 import com.nttdata.bankservice.entity.Customer;
 import com.nttdata.bankservice.services.CustomerService;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@RequestMapping(value = "/api/v1/custom")
+@RequestMapping(value = "/api/v1/customer")
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerController {
@@ -27,12 +28,11 @@ public class CustomerController {
         return new ResponseEntity<Mono<Customer>>(custSave, HttpStatus.OK);
     }
 
-    @GetMapping("/{customId}")
-    public ResponseEntity<Mono<Customer>> findById(@PathVariable("customId") String id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Mono<Customer>> findById(@PathVariable("id") String id) {
         Mono<Customer> findId = custService.findById(id);
         return new ResponseEntity<Mono<Customer>>(findId, HttpStatus.OK);
     }
-
 
     @GetMapping("/all")
     public Flux<Customer> findAll() {
@@ -47,7 +47,16 @@ public class CustomerController {
 
     @DeleteMapping("/{customId}")
     public void delete(@PathVariable("customId") String id) {
+
         custService.delete(id).subscribe();
+    }
+
+
+    @PostMapping("/notify")
+    public Mono<Void> notifyCustomer(@RequestBody CustomerNotification notification) {
+        System.out.println("Notification received for customer: " + notification.getCustomerId());
+        System.out.println("Message: " + notification.getMessage());
+        return Mono.empty();
     }
 
 }
